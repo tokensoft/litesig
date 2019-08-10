@@ -43,7 +43,7 @@ contract LightSig {
 
     // Hash for EIP712, computed from data and contract address - ensures it can't be replayed against
     // other contracts or chains
-    bytes32 DOMAIN_SEPARATOR;
+    bytes32 public DOMAIN_SEPARATOR;
 
     // The constructor inputs a list of owners and the number of signatures that
     //   are required before a transaction is executed.
@@ -128,7 +128,7 @@ contract LightSig {
     /**
      * Once the owners of the multisig have signed across the payload, they can submit it to this function.
      * This will verify enough signatures were aggregated and then broadcast the transaction.
-     * It can be used to send ETH  or trigger a function call against another address (or both).
+     * It can be used to send ETH or trigger a function call against another address (or both).
      *
      * Signatures must be in the correct ascending order (according to associated addresses)
      */
@@ -142,8 +142,8 @@ contract LightSig {
     ) public returns (bool)
     {
         // Verify signature lengths
-        require(sigR.length == requiredSignatures, "Signatures list is not the expected length");
         require(sigR.length == sigS.length && sigR.length == sigV.length, "Sig arrays not the same lengths");
+        require(sigR.length == requiredSignatures, "Signatures list is not the expected length");
 
         // Verify sender is an owner
         require(ownersMap[msg.sender], "Only owners can submit transactions");
@@ -166,8 +166,8 @@ contract LightSig {
 
             // Ensure the signature is from an owner address and there are no duplicates
             // Also verifies error of 0 returned
-            require(recovered > lastAdd, "Signature must be unique");
             require(ownersMap[recovered], "Signature must be from an owner");
+            require(recovered > lastAdd, "Signature must be unique");
             lastAdd = recovered;
         }
 
