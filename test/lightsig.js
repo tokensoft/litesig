@@ -19,15 +19,15 @@ const createSigs = async (signers, multisigAddr, nonce, destinationAddr, value, 
   const dataInput = web3.utils.sha3(data, { encoding: 'hex' }).slice(2)
   const nonceInput = nonce.toString(16).padStart(64, '0')
 
-  let txInput = TXTYPE_HASH + destInput + valInput + dataInput + nonceInput
-  let txInputHash = web3.utils.sha3(txInput, { encoding: 'hex' })
+  const txInput = TXTYPE_HASH + destInput + valInput + dataInput + nonceInput
+  const txInputHash = web3.utils.sha3(txInput, { encoding: 'hex' })
 
-  let input = '0x19' + '01' + DOMAIN_SEPARATOR.slice(2) + txInputHash.slice(2)
-  let hash = web3.utils.sha3(input, { encoding: 'hex' })
+  const input = '0x19' + '01' + DOMAIN_SEPARATOR.slice(2) + txInputHash.slice(2)
+  const hash = web3.utils.sha3(input, { encoding: 'hex' })
 
-  let sigV = []
-  let sigR = []
-  let sigS = []
+  const sigV = []
+  const sigR = []
+  const sigS = []
 
   for (var i = 0; i < signers.length; i++) {
     // let sig = await web3.eth.sign(hash, signers[i])
@@ -81,7 +81,7 @@ contract('LightSig', (accounts) => {
       assert.fail('Should not allow')
     } catch (ex) {}
 
-    let signers = [accounts[0], accounts[1]]
+    const signers = [accounts[0], accounts[1]]
     signers.sort()
     signers.reverse()
     try {
@@ -91,7 +91,7 @@ contract('LightSig', (accounts) => {
   })
 
   it('should fail without proper requirement', async () => {
-    let signers = [accounts[0], accounts[1]]
+    const signers = [accounts[0], accounts[1]]
     signers.sort()
 
     try {
@@ -106,25 +106,25 @@ contract('LightSig', (accounts) => {
   })
 
   it('should fail with unknown sig and send', async () => {
-    let signers = [accounts[0], accounts[1]]
+    const signers = [accounts[0], accounts[1]]
     signers.sort()
-    let multisig = await LightSig.new(signers, 2, CHAINID, { from: accounts[0] })
+    const multisig = await LightSig.new(signers, 2, CHAINID, { from: accounts[0] })
 
     await web3.eth.sendTransaction({ from: accounts[0], to: multisig.address, value: web3.utils.toWei('0.1', 'ether') })
 
     // Get the nonce
-    let nonce = await multisig.nonce.call()
+    const nonce = await multisig.nonce.call()
 
-    let randomAddr = '0xD01c92937400DD1ecE24992B1dc44Aeaa47Ae72a'
+    const randomAddr = '0xD01c92937400DD1ecE24992B1dc44Aeaa47Ae72a'
 
-    let amount = web3.utils.toWei('0.1', 'ether')
-    let data = '0x0'
+    const amount = web3.utils.toWei('0.1', 'ether')
+    const data = '0x0'
 
     // Create random sig
-    let badSigners = [accounts[0], accounts[5]]
+    const badSigners = [accounts[0], accounts[5]]
     badSigners.sort()
 
-    let signatures = await createSigs(badSigners, multisig.address, nonce, randomAddr, amount, data)
+    const signatures = await createSigs(badSigners, multisig.address, nonce, randomAddr, amount, data)
 
     // Try the send
     try {
@@ -134,25 +134,25 @@ contract('LightSig', (accounts) => {
   })
 
   it('should fail with duplicate sig and send', async () => {
-    let signers = [accounts[0], accounts[1]]
+    const signers = [accounts[0], accounts[1]]
     signers.sort()
-    let multisig = await LightSig.new(signers, 2, CHAINID, { from: accounts[0] })
+    const multisig = await LightSig.new(signers, 2, CHAINID, { from: accounts[0] })
 
     await web3.eth.sendTransaction({ from: accounts[0], to: multisig.address, value: web3.utils.toWei('0.1', 'ether') })
 
     // Get the nonce
-    let nonce = await multisig.nonce.call()
+    const nonce = await multisig.nonce.call()
 
-    let randomAddr = '0xD01c92937400DD1ecE24992B1dc44Aeaa47Ae72a'
+    const randomAddr = '0xD01c92937400DD1ecE24992B1dc44Aeaa47Ae72a'
 
-    let amount = web3.utils.toWei('0.1', 'ether')
-    let data = '0x0'
+    const amount = web3.utils.toWei('0.1', 'ether')
+    const data = '0x0'
 
     // Create random sig
-    let badSigners = [accounts[0], accounts[0]]
+    const badSigners = [accounts[0], accounts[0]]
     badSigners.sort()
 
-    let signatures = await createSigs(badSigners, multisig.address, nonce, randomAddr, amount, data)
+    const signatures = await createSigs(badSigners, multisig.address, nonce, randomAddr, amount, data)
 
     // Try the send
     try {
@@ -162,55 +162,55 @@ contract('LightSig', (accounts) => {
   })
 
   it('should create and send', async () => {
-    let signers = [accounts[0], accounts[1]]
+    const signers = [accounts[0], accounts[1]]
     signers.sort()
-    let multisig = await LightSig.new(signers, 2, CHAINID, { from: accounts[0] })
+    const multisig = await LightSig.new(signers, 2, CHAINID, { from: accounts[0] })
 
     await web3.eth.sendTransaction({ from: accounts[0], to: multisig.address, value: web3.utils.toWei('0.1', 'ether') })
 
     // Get the nonce
-    let nonce = await multisig.nonce.call()
+    const nonce = await multisig.nonce.call()
 
-    let randomAddr = '0xD01c92937400DD1ecE24992B1dc44Aeaa47Ae72a'
-    let originalBalance = await web3.eth.getBalance(randomAddr)
+    const randomAddr = '0xD01c92937400DD1ecE24992B1dc44Aeaa47Ae72a'
+    const originalBalance = await web3.eth.getBalance(randomAddr)
 
-    let amount = web3.utils.toWei('0.1', 'ether')
-    let data = '0x0'
+    const amount = web3.utils.toWei('0.1', 'ether')
+    const data = '0x0'
 
-    let signatures = await createSigs(signers, multisig.address, nonce, randomAddr, amount, data)
+    const signatures = await createSigs(signers, multisig.address, nonce, randomAddr, amount, data)
 
     // Try the send
     await multisig.submit(signatures.sigV, signatures.sigR, signatures.sigS, randomAddr, amount, data, { from: accounts[0] })
 
-    let afterValue = await web3.eth.getBalance(randomAddr)
-    let expectedBalance = web3.utils.toBN(originalBalance).add(web3.utils.toBN(amount)).toString()
+    const afterValue = await web3.eth.getBalance(randomAddr)
+    const expectedBalance = web3.utils.toBN(originalBalance).add(web3.utils.toBN(amount)).toString()
 
     assert.equal(afterValue, expectedBalance, 'Amount in random address should be amount sent')
   })
 
   it('should fail with replay attack', async () => {
-    let signers = [accounts[0], accounts[1]]
+    const signers = [accounts[0], accounts[1]]
     signers.sort()
-    let multisig = await LightSig.new(signers, 2, CHAINID, { from: accounts[0] })
+    const multisig = await LightSig.new(signers, 2, CHAINID, { from: accounts[0] })
 
     await web3.eth.sendTransaction({ from: accounts[0], to: multisig.address, value: web3.utils.toWei('0.1', 'ether') })
 
     // Get the nonce
-    let nonce = await multisig.nonce.call()
+    const nonce = await multisig.nonce.call()
 
-    let randomAddr = '0xD01c92937400DD1ecE24992B1dc44Aeaa47Ae72a'
-    let originalBalance = await web3.eth.getBalance(randomAddr)
+    const randomAddr = '0xD01c92937400DD1ecE24992B1dc44Aeaa47Ae72a'
+    const originalBalance = await web3.eth.getBalance(randomAddr)
 
-    let amount = web3.utils.toWei('0.1', 'ether')
-    let data = '0x0'
+    const amount = web3.utils.toWei('0.1', 'ether')
+    const data = '0x0'
 
-    let signatures = await createSigs(signers, multisig.address, nonce, randomAddr, amount, data)
+    const signatures = await createSigs(signers, multisig.address, nonce, randomAddr, amount, data)
 
     // Try the send
     await multisig.submit(signatures.sigV, signatures.sigR, signatures.sigS, randomAddr, amount, data, { from: accounts[0] })
 
-    let afterValue = await web3.eth.getBalance(randomAddr)
-    let expectedBalance = web3.utils.toBN(originalBalance).add(web3.utils.toBN(amount)).toString()
+    const afterValue = await web3.eth.getBalance(randomAddr)
+    const expectedBalance = web3.utils.toBN(originalBalance).add(web3.utils.toBN(amount)).toString()
 
     assert.equal(afterValue, expectedBalance, 'Amount in random address should be amount sent')
 
