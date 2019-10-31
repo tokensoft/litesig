@@ -145,8 +145,9 @@ contract LightSig {
         require(sigR.length == sigS.length && sigR.length == sigV.length, "Sig arrays not the same lengths");
         require(sigR.length == requiredSignatures, "Signatures list is not the expected length");
 
+        // TODO determine validation requiremens for sender
         // Verify sender is an owner
-        require(ownersMap[msg.sender], "Only owners can submit transactions");
+        // require(ownersMap[msg.sender], "Only owners can submit transactions");
 
         // EIP712 scheme: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md
         // Note that the nonce is always included from the contract state to prevent replay attacks
