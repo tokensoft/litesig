@@ -36,10 +36,10 @@ contract LightSig {
     bytes32 constant VERSION_HASH = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
 
     // keccak256("MultiSigTransaction(address destination,uint256 value,bytes data,uint256 nonce)")
-    bytes32 constant TXTYPE_HASH = 0xebbfa7b286e52d30a13889efa8ca90a696b0e6ec0936c8688c357c7d2bdd0430;
+    bytes32 constant TXTYPE_HASH = 0xe7beff35c01d1bb188c46fbae3d80f308d2600ba612c687a3e61446e0dffda0b;
 
-    // keccak256("POOLE_PARTY")
-    bytes32 constant SALT = 0x251543af6a222378665a76fe38dbceae4871a070b7fdaf5c6c30cf758dc33cc0;
+    // keccak256("TOKENSOFT")
+    bytes32 constant SALT = 0x9c360831104e550f13ec032699c5f1d7f17190a31cdaf5c83945a04dfd319eea;
 
     // Hash for EIP712, computed from data and contract address - ensures it can't be replayed against
     // other contracts or chains
