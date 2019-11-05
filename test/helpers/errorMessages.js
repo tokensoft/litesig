@@ -6,5 +6,10 @@ module.exports = {
   INVALID_SENDER: 'Only owners can submit transactions',
   INIT_OWNER_LIST_FAIL: 'Owners List min is 1 and max is 10',
   INIT_REQ_VAL_FAIL: 'Required signatures must be in the proper range',
-  INIT_OWNER_LIST_INVALID: 'Owner addresses must be unique and in order'
+  INIT_OWNER_LIST_INVALID: 'Owner addresses must be unique and in order',
+  NOT_INITIALIZED: 'Initialization must be complete',
+  NOT_OWNER: 'Ownable: caller is not the owner',
+  ALREADY_ADMIN: 'Account to be added to admin list is already an admin',
+  NOT_ADMIN: 'Account to be removed from admin list is not already an admin',
+  NOT_ADMIN_REVERT: 'Calling account is not an administrator.'
 }

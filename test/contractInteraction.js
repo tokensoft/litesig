@@ -2,15 +2,9 @@
 const GenericToken = artifacts.require('GenericToken')
 const LightSig = artifacts.require('LightSig')
 const createSigs = require('./helpers/createSigs')
+const constants = require('./helpers/constants')
 
-const CHAINID = 1234
-
-const generateRandomAccountList = (count) =>
-  [...Array(count)].map((_) => web3.eth.accounts.create())
-
-// Need  to sort with case insensitive comparator
-const generateOrderedRandomAccountList = (count) =>
-  generateRandomAccountList(count).sort((acct1, acct2) => acct1.address.localeCompare(acct2.address))
+const { generateOrderedRandomAccountList } = require('./helpers/addressLists')
 
 contract('LightSig ERC20 Transfer', (accounts) => {
   it('should send some eth', async () => {
@@ -18,7 +12,8 @@ contract('LightSig ERC20 Transfer', (accounts) => {
     const signingAddresses = signers.map(acct => acct.address)
     const fullCosignerList = [...signingAddresses, accounts[0]].sort((addr1, addr2) => addr1.localeCompare(addr2))
 
-    const multisig = await LightSig.new(fullCosignerList, 2, CHAINID, { from: accounts[0] })
+    const multisig = await LightSig.new()
+    await multisig.init(fullCosignerList, 2, constants.CHAINID)
 
     // Populate multisig with Tokens
     const assetToken = await GenericToken.new('AssetToken', 'AST', 0, 1000)

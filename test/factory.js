@@ -1,27 +1,13 @@
-/* global contract, it, artifacts, assert, web3 */
+/* global contract, it, artifacts, assert */
 const { expectRevert } = require('openzeppelin-test-helpers')
 
 const LightSigFactory = artifacts.require('LightSigFactory')
 const LightSig = artifacts.require('LightSig')
 
-const CHAINID = 1234
+const constants = require('./helpers/constants')
+const errors = require('./helpers/errorMessages')
 
-const EIP712DOMAINTYPE_HASH = '0xd87cd6ef79d4e2b95e15ce8abf732db51ec771f1ca2edccf22a46c729ac56472'
-const NAME_HASH = '0xe0f1e1c99009e212fa1e207fccef2ee9432c52bbf5ef25688885ea0cce69531d'
-const VERSION_HASH = '0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6'
-const SALT = '0x251543af6a222378665a76fe38dbceae4871a070b7fdaf5c6c30cf758dc33cc0'
-
-const getDomainSeparator = (address) => {
-  const domainData = EIP712DOMAINTYPE_HASH + NAME_HASH.slice(2) + VERSION_HASH.slice(2) + CHAINID.toString('16').padStart(64, '0') + address.slice(2).padStart(64, '0') + SALT.slice(2)
-  return web3.utils.sha3(domainData, { encoding: 'hex' })
-}
-
-const generateRandomAddressList = (count) =>
-  [...Array(count)].map((_) => web3.eth.accounts.create().address)
-
-// Need  to sort with case insensitive comparator
-const generateOrderedRandomAddressList = (count) =>
-  generateRandomAddressList(count).sort((addr1, addr2) => addr1.localeCompare(addr2))
+const { generateOrderedRandomAddressList, getDomainSeparator } = require('./helpers/addressLists.js')
 
 contract('LightSig Factory', (accounts) => {
   it('should deploy through factory', async () => {
@@ -29,10 +15,10 @@ contract('LightSig Factory', (accounts) => {
 
     const deployedFactory = await LightSigFactory.new()
 
-    const deployReceipt = await deployedFactory.createLightSig(123, addrs, 2, CHAINID)
+    const deployReceipt = await deployedFactory.createLightSig('0x0', addrs, 2, constants.CHAINID)
 
     // Pull the deployted address from the logs
-    const deployed = await LightSig.at(deployReceipt.logs[0].args[1])
+    const deployed = await LightSig.at(deployReceipt.logs[0].args[0])
 
     // Validate owners list is correct
     addrs.map(async (addr, i) => {
@@ -46,5 +32,29 @@ contract('LightSig Factory', (accounts) => {
     assert.equal(await deployed.nonce.call(), 0, 'Nonce should be set')
     assert.equal(await deployed.requiredSignatures.call(), 2, 'requiredSignatures should be set')
     assert.equal(await deployed.DOMAIN_SEPARATOR.call(), getDomainSeparator(deployed.address), 'DOMAIN_SEPARATOR should be set')
+  })
+
+  it('should deploy with admin checks', async () => {
+    const addrs = generateOrderedRandomAddressList(3)
+
+    const deployedFactory = await LightSigFactory.new()
+
+    // Should succeed with default account
+    await deployedFactory.createLightSig('0x0', addrs, 2, constants.CHAINID)
+
+    // Should fail with non admin
+    await expectRevert(deployedFactory.createLightSig('0x0', addrs, 2, constants.CHAINID, { from: accounts[2] }), errors.NOT_ADMIN_REVERT)
+
+    // Add account 2 as admin
+    await deployedFactory.addAdmin(accounts[2])
+
+    // Should succeed now
+    await deployedFactory.createLightSig('0x01', addrs, 2, constants.CHAINID, { from: accounts[2] })
+
+    // Remove acct 2
+    await deployedFactory.removeAdmin(accounts[2])
+
+    // Should fail again
+    await expectRevert(deployedFactory.createLightSig('0x02', addrs, 2, constants.CHAINID, { from: accounts[2] }), errors.NOT_ADMIN_REVERT)
   })
 })

@@ -45,12 +45,20 @@ contract LightSig {
     // other contracts or chains
     bytes32 public DOMAIN_SEPARATOR;
 
-    // The constructor inputs a list of owners and the number of signatures that
+    // Track init state
+    bool initialized = false;
+
+    // The init function inputs a list of owners and the number of signatures that
     //   are required before a transaction is executed.
     // Owners list must be in ascending address order.
     // Required sigs must be greater than 0 and less than or equal to number of owners.
     // Chain ID prevents replay across chains
-    constructor(address[] memory _owners, uint _requiredSignatures, uint chainId) public {
+    // This function can only be run one time
+    function init(address[] memory _owners, uint _requiredSignatures, uint chainId) public {
+        // Verify it can't be initialized again
+        require(!initialized, "Init function can only be run once");
+        initialized = true;
+
         // Verify the lengths of values being passed in
         require(_owners.length > 0 && _owners.length <= 10, "Owners List min is 1 and max is 10");
         require(
@@ -141,13 +149,12 @@ contract LightSig {
         bytes memory data
     ) public returns (bool)
     {
+        // Verify initialized
+        require(initialized, "Initialization must be complete");
+
         // Verify signature lengths
         require(sigR.length == sigS.length && sigR.length == sigV.length, "Sig arrays not the same lengths");
         require(sigR.length == requiredSignatures, "Signatures list is not the expected length");
-
-        // TODO determine validation requiremens for sender
-        // Verify sender is an owner
-        // require(ownersMap[msg.sender], "Only owners can submit transactions");
 
         // EIP712 scheme: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md
         // Note that the nonce is always included from the contract state to prevent replay attacks
