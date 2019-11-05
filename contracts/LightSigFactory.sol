@@ -27,18 +27,18 @@ contract LightSigFactory is Administratable {
   function createLightSig(bytes32 salt, address[] memory _owners, uint _requiredSignatures, uint chainId)
     public onlyAdministrator returns (address) {
     // Track the address for the new contract
-		address payable deployedAddress;
+    address payable deployedAddress;
 
-		// Get the creation code from the payment handler
+    // Get the creation code from the payment handler
     bytes memory code = type(LightSig).creationCode;
 
-		// Drop into assembly to deploy with create2
+    // Drop into assembly to deploy with create2
     assembly {
       deployedAddress := create2(0, add(code, 0x20), mload(code), salt)
       if iszero(extcodesize(deployedAddress)) { revert(0, 0) }
     }
 
-		// Initialize the contract with this master's address
+    // Initialize the contract with this master's address
     LightSig(deployedAddress).init(_owners, _requiredSignatures, chainId);
 
     // Trigger the event for any listeners
