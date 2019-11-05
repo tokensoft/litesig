@@ -20,7 +20,8 @@ contract('LightSig Validation', (accounts) => {
     const signingAddresses = signers.map(acct => acct.address)
     const fullCosignerList = [...signingAddresses, accounts[0]].sort((addr1, addr2) => addr1.localeCompare(addr2))
 
-    const multisig = await LightSig.new(fullCosignerList, 2, CHAINID, { from: accounts[0] })
+    const multisig = await LightSig.new()
+    await multisig.init(fullCosignerList, 2, CHAINID, { from: accounts[0] })
 
     // Populate with ETH
     await web3.eth.sendTransaction({ from: accounts[0], to: multisig.address, value: web3.utils.toWei('0.1', 'ether') })
@@ -50,7 +51,8 @@ contract('LightSig Validation', (accounts) => {
     const signingAddresses = signers.map(acct => acct.address)
     const fullCosignerList = [...signingAddresses, accounts[0]].sort((addr1, addr2) => addr1.localeCompare(addr2))
 
-    const multisig = await LightSig.new(fullCosignerList, 2, CHAINID, { from: accounts[0] })
+    const multisig = await LightSig.new()
+    await multisig.init(fullCosignerList, 2, CHAINID, { from: accounts[0] })
 
     // Populate with ETH
     await web3.eth.sendTransaction({ from: accounts[0], to: multisig.address, value: web3.utils.toWei('0.1', 'ether') })
@@ -95,9 +97,6 @@ contract('LightSig Validation', (accounts) => {
       ]
     }
     await expectRevert(multisig.submit(invalid.sigV, invalid.sigR, invalid.sigS, destination, amount, data, { from: accounts[0] }), errors.SIG_NOT_UNIQUE)
-
-    // Verify non-owners can't send
-    await expectRevert(multisig.submit(validSigs.sigV, validSigs.sigR, validSigs.sigS, destination, amount, data, { from: accounts[1] }), errors.INVALID_SENDER)
 
     // Verify replay
     await multisig.submit(validSigs.sigV, validSigs.sigR, validSigs.sigS, destination, amount, data, { from: accounts[0] })
