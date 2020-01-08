@@ -1,13 +1,13 @@
 pragma solidity 0.5.8;
 
-import "./LightSig.sol";
+import "./LiteSig.sol";
 import "./Administratable.sol";
 
 /**
- * LightSig Factory creates new instances of the multisig contract and triggers an event
+ * LiteSig Factory creates new instances of the multisig contract and triggers an event
  * for listeners to see the new contract.
  */
-contract LightSigFactory is Administratable {
+contract LiteSigFactory is Administratable {
 
   // Event to track deployments
   event Deployed(address indexed deployedAddress);
@@ -24,13 +24,13 @@ contract LightSigFactory is Administratable {
    * (the standard approach to locking in the sender addr into the salt was not chosen in case a long time
    * passes before the contract is created and a new deployment account is required for some unknown reason)
    */
-  function createLightSig(bytes32 salt, address[] memory _owners, uint _requiredSignatures, uint chainId)
+  function createLiteSig(bytes32 salt, address[] memory _owners, uint _requiredSignatures, uint chainId)
     public onlyAdministrator returns (address) {
     // Track the address for the new contract
     address payable deployedAddress;
 
     // Get the creation code from the payment handler
-    bytes memory code = type(LightSig).creationCode;
+    bytes memory code = type(LiteSig).creationCode;
 
     // Drop into assembly to deploy with create2
     assembly {
@@ -39,7 +39,7 @@ contract LightSigFactory is Administratable {
     }
 
     // Initialize the contract with this master's address
-    LightSig(deployedAddress).init(_owners, _requiredSignatures, chainId);
+    LiteSig(deployedAddress).init(_owners, _requiredSignatures, chainId);
 
     // Trigger the event for any listeners
     emit Deployed(deployedAddress);

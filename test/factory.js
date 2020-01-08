@@ -1,24 +1,24 @@
 /* global contract, it, artifacts, assert */
 const { expectRevert } = require('openzeppelin-test-helpers')
 
-const LightSigFactory = artifacts.require('LightSigFactory')
-const LightSig = artifacts.require('LightSig')
+const LiteSigFactory = artifacts.require('LiteSigFactory')
+const LiteSig = artifacts.require('LiteSig')
 
 const constants = require('./helpers/constants')
 const errors = require('./helpers/errorMessages')
 
 const { generateOrderedRandomAddressList, getDomainSeparator } = require('./helpers/addressLists.js')
 
-contract('LightSig Factory', (accounts) => {
+contract('LiteSig Factory', (accounts) => {
   it('should deploy through factory', async () => {
     const addrs = generateOrderedRandomAddressList(3)
 
-    const deployedFactory = await LightSigFactory.new()
+    const deployedFactory = await LiteSigFactory.new()
 
-    const deployReceipt = await deployedFactory.createLightSig('0x0', addrs, 2, constants.CHAINID)
+    const deployReceipt = await deployedFactory.createLiteSig('0x0', addrs, 2, constants.CHAINID)
 
     // Pull the deployted address from the logs
-    const deployed = await LightSig.at(deployReceipt.logs[0].args[0])
+    const deployed = await LiteSig.at(deployReceipt.logs[0].args[0])
 
     // Validate owners list is correct
     addrs.map(async (addr, i) => {
@@ -37,24 +37,24 @@ contract('LightSig Factory', (accounts) => {
   it('should deploy with admin checks', async () => {
     const addrs = generateOrderedRandomAddressList(3)
 
-    const deployedFactory = await LightSigFactory.new()
+    const deployedFactory = await LiteSigFactory.new()
 
     // Should succeed with default account
-    await deployedFactory.createLightSig('0x0', addrs, 2, constants.CHAINID)
+    await deployedFactory.createLiteSig('0x0', addrs, 2, constants.CHAINID)
 
     // Should fail with non admin
-    await expectRevert(deployedFactory.createLightSig('0x0', addrs, 2, constants.CHAINID, { from: accounts[2] }), errors.NOT_ADMIN_REVERT)
+    await expectRevert(deployedFactory.createLiteSig('0x0', addrs, 2, constants.CHAINID, { from: accounts[2] }), errors.NOT_ADMIN_REVERT)
 
     // Add account 2 as admin
     await deployedFactory.addAdmin(accounts[2])
 
     // Should succeed now
-    await deployedFactory.createLightSig('0x01', addrs, 2, constants.CHAINID, { from: accounts[2] })
+    await deployedFactory.createLiteSig('0x01', addrs, 2, constants.CHAINID, { from: accounts[2] })
 
     // Remove acct 2
     await deployedFactory.removeAdmin(accounts[2])
 
     // Should fail again
-    await expectRevert(deployedFactory.createLightSig('0x02', addrs, 2, constants.CHAINID, { from: accounts[2] }), errors.NOT_ADMIN_REVERT)
+    await expectRevert(deployedFactory.createLiteSig('0x02', addrs, 2, constants.CHAINID, { from: accounts[2] }), errors.NOT_ADMIN_REVERT)
   })
 })
