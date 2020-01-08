@@ -1,12 +1,12 @@
 /* global artifacts contract it assert */
-const liteSigFactory = artifacts.require('liteSigFactory')
+const LiteSigFactory = artifacts.require('LiteSigFactory')
 
 /**
  * Sanity check for transferring ownership.  Most logic is fully tested in OpenZeppelin lib.
  */
 contract('Ownable', (accounts) => {
   it('should deploy', async () => {
-    const factoryInstance = await liteSigFactory.new()
+    const factoryInstance = await LiteSigFactory.new()
     assert.equal(factoryInstance !== null, true, 'Contract should be deployed')
 
     // Current owner

@@ -1,12 +1,12 @@
 pragma solidity 0.5.8;
 
 /**
- * liteSig is a lighter weight multisig based on https://github.com/christianlundkvist/simple-multisig
+ * LiteSig is a lighter weight multisig based on https://github.com/christianlundkvist/simple-multisig
  * Owners aggregate signatures offline and then broadcast a transaction with the required number of signatures.
  * Unlike other multisigs, this is meant to have minimal administration functions and other features in order
  * to reduce the footprint and attack surface.
  */
-contract liteSig {
+contract LiteSig {
 
     //  Events triggered for incoming and outgoing transactions
     event Deposit(address indexed source, uint value);
@@ -29,7 +29,7 @@ contract liteSig {
     // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract,bytes32 salt)")
     bytes32 constant EIP712DOMAINTYPE_HASH = 0xd87cd6ef79d4e2b95e15ce8abf732db51ec771f1ca2edccf22a46c729ac56472;
 
-    // keccak256("liteSig")
+    // keccak256("LiteSig")
     bytes32 constant NAME_HASH = 0xe0f1e1c99009e212fa1e207fccef2ee9432c52bbf5ef25688885ea0cce69531d;
 
     // keccak256("1")

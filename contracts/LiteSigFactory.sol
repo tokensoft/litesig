@@ -4,7 +4,7 @@ import "./LiteSig.sol";
 import "./Administratable.sol";
 
 /**
- * liteSig Factory creates new instances of the multisig contract and triggers an event
+ * LiteSig Factory creates new instances of the multisig contract and triggers an event
  * for listeners to see the new contract.
  */
 contract LiteSigFactory is Administratable {
@@ -30,7 +30,7 @@ contract LiteSigFactory is Administratable {
     address payable deployedAddress;
 
     // Get the creation code from the payment handler
-    bytes memory code = type(liteSig).creationCode;
+    bytes memory code = type(LiteSig).creationCode;
 
     // Drop into assembly to deploy with create2
     assembly {
@@ -39,7 +39,7 @@ contract LiteSigFactory is Administratable {
     }
 
     // Initialize the contract with this master's address
-    liteSig(deployedAddress).init(_owners, _requiredSignatures, chainId);
+    LiteSig(deployedAddress).init(_owners, _requiredSignatures, chainId);
 
     // Trigger the event for any listeners
     emit Deployed(deployedAddress);

@@ -3,7 +3,7 @@ const errors = require('./helpers/errorMessages')
 const createSigs = require('./helpers/createSigs')
 
 const { expectRevert } = require('openzeppelin-test-helpers')
-const liteSig = artifacts.require('liteSig')
+const LiteSig = artifacts.require('LiteSig')
 
 const CHAINID = 1234
 
@@ -14,13 +14,13 @@ const generateRandomAccountList = (count) =>
 const generateOrderedRandomAccountList = (count) =>
   generateRandomAccountList(count).sort((acct1, acct2) => acct1.address.localeCompare(acct2.address))
 
-contract('liteSig Validation', (accounts) => {
+contract('LiteSig Validation', (accounts) => {
   it('should send some eth', async () => {
     const signers = generateOrderedRandomAccountList(2)
     const signingAddresses = signers.map(acct => acct.address)
     const fullCosignerList = [...signingAddresses, accounts[0]].sort((addr1, addr2) => addr1.localeCompare(addr2))
 
-    const multisig = await liteSig.new()
+    const multisig = await LiteSig.new()
     await multisig.init(fullCosignerList, 2, CHAINID, { from: accounts[0] })
 
     // Populate with ETH
@@ -51,7 +51,7 @@ contract('liteSig Validation', (accounts) => {
     const signingAddresses = signers.map(acct => acct.address)
     const fullCosignerList = [...signingAddresses, accounts[0]].sort((addr1, addr2) => addr1.localeCompare(addr2))
 
-    const multisig = await liteSig.new()
+    const multisig = await LiteSig.new()
     await multisig.init(fullCosignerList, 2, CHAINID, { from: accounts[0] })
 
     // Populate with ETH

@@ -2,35 +2,35 @@
 const errors = require('./helpers/errorMessages')
 const { expectRevert } = require('openzeppelin-test-helpers')
 
-const liteSig = artifacts.require('liteSig')
+const LiteSig = artifacts.require('LiteSig')
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 const constants = require('./helpers/constants')
 
 const { generateOrderedRandomAddressList, getDomainSeparator } = require('./helpers/addressLists.js')
 
-contract('liteSig Deploy', (accounts) => {
+contract('LiteSig Deploy', (accounts) => {
   it('should deploy', async () => {
     const addresses = generateOrderedRandomAddressList(5)
-    const multisig = await liteSig.new()
+    const multisig = await LiteSig.new()
     await multisig.init(addresses, 2, constants.CHAINID)
   })
 
   it('should verify initialization', async () => {
-    const multisig = await liteSig.new()
+    const multisig = await LiteSig.new()
     await expectRevert(multisig.submit([], [], [], accounts[0], '0', '0x0'), errors.NOT_INITIALIZED)
   })
 
   it('should verify owners length', async () => {
-    const multisig = await liteSig.new()
+    const multisig = await LiteSig.new()
     await expectRevert(multisig.init([], 0, constants.CHAINID), errors.INIT_OWNER_LIST_FAIL)
     await expectRevert(multisig.init(generateOrderedRandomAddressList(11), 0, constants.CHAINID), errors.INIT_OWNER_LIST_FAIL)
   })
 
   it('should verify requirement value', async () => {
-    let multisig = await liteSig.new()
+    let multisig = await LiteSig.new()
     await expectRevert(multisig.init(generateOrderedRandomAddressList(5), 0, constants.CHAINID), errors.INIT_REQ_VAL_FAIL)
-    multisig = await liteSig.new()
+    multisig = await LiteSig.new()
     await expectRevert(multisig.init(generateOrderedRandomAddressList(5), 6, constants.CHAINID), errors.INIT_REQ_VAL_FAIL)
   })
 
@@ -38,30 +38,30 @@ contract('liteSig Deploy', (accounts) => {
     //  Insert a 0 address
     let list = generateOrderedRandomAddressList(5)
     list[0] = ZERO_ADDR
-    let multisig = await liteSig.new()
+    let multisig = await LiteSig.new()
     await expectRevert(multisig.init(list, 2, constants.CHAINID), errors.INIT_OWNER_LIST_INVALID)
 
     //  Insert a 0 address into the middle
     list = generateOrderedRandomAddressList(5)
     list[3] = ZERO_ADDR
-    multisig = await liteSig.new()
+    multisig = await LiteSig.new()
     await expectRevert(multisig.init(list, 2, constants.CHAINID), errors.INIT_OWNER_LIST_INVALID)
 
     // Reverse the order of addresses
     list = generateOrderedRandomAddressList(5).reverse()
-    multisig = await liteSig.new()
+    multisig = await LiteSig.new()
     await expectRevert(multisig.init(list, 2, constants.CHAINID), errors.INIT_OWNER_LIST_INVALID)
 
     // Duplicate an address
     list = generateOrderedRandomAddressList(5).reverse()
     list[3] = list[4]
-    multisig = await liteSig.new()
+    multisig = await LiteSig.new()
     await expectRevert(multisig.init(list, 2, constants.CHAINID), errors.INIT_OWNER_LIST_INVALID)
   })
 
   it('should save init params', async () => {
     const addrs = generateOrderedRandomAddressList(3)
-    const deployed = await liteSig.new()
+    const deployed = await LiteSig.new()
     await deployed.init(addrs, 2, constants.CHAINID)
 
     // Validate owners list is correct

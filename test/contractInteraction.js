@@ -1,18 +1,18 @@
 /* global contract, it, artifacts, assert, web3 */
 const GenericToken = artifacts.require('GenericToken')
-const liteSig = artifacts.require('liteSig')
+const LiteSig = artifacts.require('LiteSig')
 const createSigs = require('./helpers/createSigs')
 const constants = require('./helpers/constants')
 
 const { generateOrderedRandomAccountList } = require('./helpers/addressLists')
 
-contract('liteSig ERC20 Transfer', (accounts) => {
+contract('LiteSig ERC20 Transfer', (accounts) => {
   it('should send some eth', async () => {
     const signers = generateOrderedRandomAccountList(2)
     const signingAddresses = signers.map(acct => acct.address)
     const fullCosignerList = [...signingAddresses, accounts[0]].sort((addr1, addr2) => addr1.localeCompare(addr2))
 
-    const multisig = await liteSig.new()
+    const multisig = await LiteSig.new()
     await multisig.init(fullCosignerList, 2, constants.CHAINID)
 
     // Populate multisig with Tokens
