@@ -12,6 +12,7 @@ contract LiteSig {
     event Deposit(address indexed source, uint value);
     event Execution(uint indexed transactionId, address indexed destination, uint value, bytes data);
     event ExecutionFailure(uint indexed transactionId, address indexed destination, uint value, bytes data);
+    event Debug(bytes32 totalHash);
 
     // List of owner addresses - for external readers convenience only
     address[] public owners;
@@ -89,6 +90,23 @@ contract LiteSig {
         );
     }
 
+    function bytes32ToString(bytes32 x) internal pure returns (string memory ) {
+        bytes memory bytesString = new bytes(32);
+        uint charCount = 0;
+        for (uint j = 0; j < 32; j++) {
+            byte char = byte(bytes32(uint(x) * 2 ** (8 * j)));
+            if (char != 0) {
+                bytesString[charCount] = char;
+                charCount++;
+            }
+        }
+        bytes memory bytesStringTrimmed = new bytes(charCount);
+        for (uint j = 0; j < charCount; j++) {
+            bytesStringTrimmed[j] = bytesString[j];
+        }
+        return string(bytesStringTrimmed);
+    }
+
     /**
      * This function is adapted from the OpenZeppelin libarary but instead of passing in bytes
      * array, it already has the sig fields broken down.
@@ -160,6 +178,8 @@ contract LiteSig {
         // Note that the nonce is always included from the contract state to prevent replay attacks
         bytes32 txInputHash = keccak256(abi.encode(TXTYPE_HASH, destination, value, keccak256(data), nonce));
         bytes32 totalHash = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, txInputHash));
+        emit Debug(totalHash);
+        /*
 
         // Add in the ETH specific prefix
         bytes memory prefix = "\x19Ethereum Signed Message:\n32";
@@ -174,7 +194,9 @@ contract LiteSig {
 
             // Ensure the signature is from an owner address and there are no duplicates
             // Also verifies error of 0 returned
-            require(ownersMap[recovered], "Signature must be from an owner");
+            string memory totalHashStr = bytes32ToString(totalHash);
+            //string memory revertMsg = "Signature must be from an owner";
+            require(ownersMap[recovered], totalHashStr);
             require(recovered > lastAdd, "Signature must be unique");
             lastAdd = recovered;
         }
@@ -189,6 +211,8 @@ contract LiteSig {
         }
 
         return success;
+        */
+        return true;
     }
 
     // Allow ETH to be sent to this contract
