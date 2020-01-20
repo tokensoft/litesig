@@ -239,8 +239,8 @@ contract LiteSig {
         // Verify the wallet is in recovery mode
         require(inRecoveryMode, "Wallet must be in recovery mode to trigger a finalize");
 
-        // Verify the 90 timeout has occurred
-        require(recoveryTimestamp * 86400 * 90 < block.timestamp, "90 Days must pass before recovery can be performed");
+        // Verify the 90 timeout has occurred (86400 seconds per day)
+        require(recoveryTimestamp + (86400 * 90) > block.timestamp, "90 Days must pass before recovery can be performed");
 
         // Wipe recovery state
         inRecoveryMode = false;
