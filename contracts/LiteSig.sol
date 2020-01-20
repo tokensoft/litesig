@@ -196,4 +196,57 @@ contract LiteSig {
         emit Deposit(msg.sender, msg.value);
     }
 
+    // Track whether the wallet is in recovery mode
+    bool public inRecoveryMode = false;
+
+    // Track the date when recovery mode was enabled
+    uint public recoveryTimestamp = 0;
+
+    // Track the list of new owners if recovery is performed
+    address[] recoveryOwners;
+
+    modifier onlyOwner {
+        bool isOwner = false;
+        for(uint8 i = 0 ; i < owners.length; i++){
+            if(owners[i] == msg.sender){
+                isOwner = true;
+                break;
+            }
+        }
+        require(isOwner, "Only owner can call this function.");
+        _;
+    }
+
+    /**
+     * An owner can trigger recovery after 90 days has passed.
+     * This should be used in case a user loses their keys.
+     */
+    function startRecover(address[] memory _owners) public onlyOwner {
+        // Verify the owner list
+        require(owners.length == _owners.length, "The recovery owners length must be the same as previous list");
+
+        // Save the desired recovery owners
+        recoveryOwners = _owners;
+
+        // Save the timestamp recovery was requested
+        recoveryTimestamp = block.timestamp;
+
+        // Set recovery mode to true
+        inRecoveryMode = true;
+    }
+
+    function finalizeRecover() public onlyOwner {
+        // Verify the wallet is in recovery mode
+        require(inRecoveryMode, "Wallet must be in recovery mode to trigger a finalize");
+
+        // Verify the 90 timeout has occurred
+        require(recoveryTimestamp * 86400 * 90 < block.timestamp, "90 Days must pass before recovery can be performed");
+
+        // Wipe recovery state
+        inRecoveryMode = false;
+
+        // Replace the owners
+        owners = recoveryOwners;
+    }
+
 }
