@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity 0.5.16;
 
 import "./LiteSig.sol";
 import "./Administratable.sol";
