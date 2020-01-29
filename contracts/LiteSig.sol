@@ -62,6 +62,10 @@ contract LiteSig {
     // Track the list of new owners if recovery is finalized
     address[] public recoveryOwners;
 
+    // Defines for requiring 180 days for a recovery option
+    uint constant SECONDS_IN_A_DAY = 86400;
+    uint constant DAYS_REQUIRED_BEFORE_TIMEOUT = 180;
+
     // The init function inputs a list of owners and the number of signatures that
     //   are required before a transaction is executed.
     // Owners list must be in ascending address order.
@@ -283,7 +287,8 @@ contract LiteSig {
         require(inRecoveryMode, "Wallet must be in recovery mode to trigger a finalize");
 
         // Verify the 180 day timeout has occurred (86400 seconds per day)
-        require(recoveryTimestamp + (86400 * 180) < block.timestamp, "180 Days must pass before recovery can be performed");
+        require(recoveryTimestamp + (SECONDS_IN_A_DAY * DAYS_REQUIRED_BEFORE_TIMEOUT) < block.timestamp,
+            "180 Days must pass before recovery can be performed");
 
         // Wipe recovery state
         inRecoveryMode = false;
