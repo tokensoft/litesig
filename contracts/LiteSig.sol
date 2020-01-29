@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity 0.5.16;
 
 /**
  * LiteSig is a lighter weight multisig based on https://github.com/christianlundkvist/simple-multisig
@@ -12,6 +12,11 @@ contract LiteSig {
     event Deposit(address indexed source, uint value);
     event Execution(uint indexed transactionId, address indexed destination, uint value, bytes data);
     event ExecutionFailure(uint indexed transactionId, address indexed destination, uint value, bytes data);
+
+    // Events for recovery feature
+    event RecoverStarted(address indexed owner, address[] newOwners);
+    event RecoverCanceled(address indexed owner);
+    event RecoverFinalized(address indexed owner, address[] newOwners);
 
     // List of owner addresses - for external readers convenience only
     address[] public owners;
@@ -47,6 +52,19 @@ contract LiteSig {
 
     // Track init state
     bool initialized = false;
+
+    // Track whether the wallet is in recovery mode
+    bool public inRecoveryMode = false;
+
+    // Track the date when recovery mode was enabled
+    uint public recoveryTimestamp = 0;
+
+    // Track the list of new owners if recovery is finalized
+    address[] public recoveryOwners;
+
+    // Defines for requiring 180 days for a recovery option
+    uint constant SECONDS_IN_A_DAY = 86400;
+    uint constant DAYS_REQUIRED_BEFORE_TIMEOUT = 180;
 
     // The init function inputs a list of owners and the number of signatures that
     //   are required before a transaction is executed.
@@ -188,12 +206,98 @@ contract LiteSig {
             emit ExecutionFailure(nonce, destination, value, data);
         }
 
+        // Any transaction going through will wipe any existing recovery attempt
+        if(inRecoveryMode) {
+            // Set the flag
+            inRecoveryMode = false;
+
+            // Emit the event to let listeners know this wallet is not in recover mode
+            emit RecoverCanceled(msg.sender);
+        }
+
         return success;
     }
 
     // Allow ETH to be sent to this contract
     function () external payable {
         emit Deposit(msg.sender, msg.value);
+    }
+
+    modifier onlyOwner {
+        bool isOwner = false;
+        for(uint8 i = 0 ; i < owners.length; i++){
+            if(owners[i] == msg.sender){
+                isOwner = true;
+                break;
+            }
+        }
+        require(isOwner, "Calling account is not an administrator.");
+        _;
+    }
+
+    /**
+     * Any single owner can trigger to start a recovery.
+     * This should be used in case a user loses their keys.
+     */
+    function startRecover(address[] memory _recoveryOwners) public onlyOwner {
+        // Verify the owner list
+        require(owners.length == _recoveryOwners.length, "The recovery owners length must be the same as previous list");
+
+        // Verify the owners list is valid and in order
+        // No 0 addresses or duplicates
+        address lastAdd = address(0);
+        for (uint i = 0; i < _recoveryOwners.length; i++) {
+            require(_recoveryOwners[i] > lastAdd, "Owner addresses must be unique and in order");
+            lastAdd = _recoveryOwners[i];
+        }
+
+        // Save the desired recovery owners
+        recoveryOwners = _recoveryOwners;
+
+        // Save the timestamp recovery was requested
+        recoveryTimestamp = block.timestamp;
+
+        // Set recovery mode to true
+        inRecoveryMode = true;
+
+        // Emit the event to let listeners know this wallet is in recover mode
+        emit RecoverStarted(msg.sender, _recoveryOwners);
+    }
+
+    /**
+     * Any single owner can cancel an attempted recovery by another owner
+     */
+    function cancelRecover() public onlyOwner {
+        // Verify the wallet is in recovery mode
+        require(inRecoveryMode, "Wallet must be in recovery mode to cancel it");
+
+        // Wipe recovery state
+        inRecoveryMode = false;
+
+        // Emit the event to let listeners know this wallet is not in recover mode
+        emit RecoverCanceled(msg.sender);
+    }
+
+    /**
+     * After the timeout and no transactions or cancels have been performed, the recovery can be finalized.
+     * Finalizing it sets the new owners.
+     */
+    function finalizeRecover() public onlyOwner {
+        // Verify the wallet is in recovery mode
+        require(inRecoveryMode, "Wallet must be in recovery mode to trigger a finalize");
+
+        // Verify the 180 day timeout has occurred (86400 seconds per day)
+        require(recoveryTimestamp + (SECONDS_IN_A_DAY * DAYS_REQUIRED_BEFORE_TIMEOUT) < block.timestamp,
+            "180 Days must pass before recovery can be performed");
+
+        // Wipe recovery state
+        inRecoveryMode = false;
+
+        // Replace the owners
+        owners = recoveryOwners;
+
+        // Emit the event to let listeners know this wallet has been recovered
+        emit RecoverFinalized(msg.sender, recoveryOwners);
     }
 
 }
