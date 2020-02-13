@@ -1,5 +1,5 @@
 /* global artifacts contract it assert */
-const { expectRevert, expectEvent } = require('@openzeppelin/test-helpers')
+const { expectRevert, expectEvent } = require('openzeppelin-test-helpers')
 const LiteSigFactory = artifacts.require('LiteSigFactory')
 const errors = require('./helpers/errorMessages')
 
