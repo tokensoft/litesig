@@ -11,7 +11,5 @@ module.exports = {
   NOT_OWNER: 'Ownable: caller is not the owner',
   ALREADY_ADMIN: 'Account to be added to admin list is already an admin',
   NOT_ADMIN: 'Account to be removed from admin list is not already an admin',
-  NOT_ADMIN_REVERT: 'Calling account is not an administrator.',
-  INVALID_RECOVER_LIST: 'The recovery owners length must be the same as previous list',
-  INVALID_TIME_RECOVER: '180 Days must pass before recovery can be performed'
+  NOT_ADMIN_REVERT: 'Calling account is not an administrator.'
 }
