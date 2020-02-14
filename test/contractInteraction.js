@@ -26,8 +26,9 @@ contract('LiteSig ERC20 Transfer', (accounts) => {
     const amount = '0'
     const data = assetToken.contract.methods.transfer(destAcct.address, 10).encodeABI()
     const destination = assetToken.address
+    const broadcastAddress = accounts[0]
 
-    const signatures = await createSigs(web3, signers, multisig.address, nonce, destination, amount, data)
+    const signatures = await createSigs(web3, signers, multisig.address, nonce, destination, amount, data, broadcastAddress)
 
     // Verify the destination address is empty
     assert.equal(await assetToken.balanceOf(destAcct.address), '0')
