@@ -35,8 +35,8 @@ contract LiteSig {
     // keccak256("1")
     bytes32 constant VERSION_HASH = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
 
-    // keccak256("MultiSigTransaction(address destination,uint256 value,bytes data,uint256 nonce, address txOrigin)")
-    bytes32 constant TXTYPE_HASH = 0x7d4c86f61d52196e1aef7a8874bc42cf755be4c3bf1e961003aa6c0283e15210;
+    // keccak256("MultiSigTransaction(address destination,uint256 value,bytes data,uint256 nonce,address txOrigin)")
+    bytes32 constant TXTYPE_HASH = 0x81336c6b66e18c614f29c0c96edcbcbc5f8e9221f35377412f0ea5d6f428918e;
 
     // keccak256("TOKENSOFT")
     bytes32 constant SALT = 0x9c360831104e550f13ec032699c5f1d7f17190a31cdaf5c83945a04dfd319eea;
