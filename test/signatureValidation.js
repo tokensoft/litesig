@@ -33,8 +33,9 @@ contract('LiteSig Validation', (accounts) => {
     const amount = web3.utils.toWei('0.1', 'ether')
     const data = '0x0'
     const destination = destAcct.address
+    const broadcastAddress = accounts[0]
 
-    const signatures = await createSigs(web3, signers, multisig.address, nonce, destination, amount, data)
+    const signatures = await createSigs(web3, signers, multisig.address, nonce, destination, amount, data, broadcastAddress)
 
     // Verify the destination address is empty
     assert.equal(await web3.eth.getBalance(destAcct.address), '0')
@@ -64,9 +65,10 @@ contract('LiteSig Validation', (accounts) => {
     const amount = web3.utils.toWei('0.1', 'ether')
     const data = '0x0'
     const destination = destAcct.address
+    const broadcastAddress = accounts[0]
 
     // Create signatures
-    const validSigs = await createSigs(web3, signers, multisig.address, nonce, destination, amount, data)
+    const validSigs = await createSigs(web3, signers, multisig.address, nonce, destination, amount, data, broadcastAddress)
 
     // Try the send with one signature's params missing
     await expectRevert(multisig.submit(validSigs.sigV.slice(1), validSigs.sigR.slice(1), validSigs.sigS.slice(1), destination, amount, data, { from: accounts[0] }), errors.SIGS_NOT_CORRECT_LEN)

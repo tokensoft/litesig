@@ -30,13 +30,13 @@ contract LiteSig {
     bytes32 constant EIP712DOMAINTYPE_HASH = 0xd87cd6ef79d4e2b95e15ce8abf732db51ec771f1ca2edccf22a46c729ac56472;
 
     // keccak256("LiteSig")
-    bytes32 constant NAME_HASH = 0xe0f1e1c99009e212fa1e207fccef2ee9432c52bbf5ef25688885ea0cce69531d;
+    bytes32 constant NAME_HASH = 0x3308695f49e3f28122810c848e1569a04488ca4f6a11835568450d7a38a86120;
 
     // keccak256("1")
     bytes32 constant VERSION_HASH = 0xc89efdaa54c0f20c7adf612882df0950f5a951637e0307cdcb4c672f298b8bc6;
 
-    // keccak256("MultiSigTransaction(address destination,uint256 value,bytes data,uint256 nonce)")
-    bytes32 constant TXTYPE_HASH = 0xe7beff35c01d1bb188c46fbae3d80f308d2600ba612c687a3e61446e0dffda0b;
+    // keccak256("MultiSigTransaction(address destination,uint256 value,bytes data,uint256 nonce,address txOrigin)")
+    bytes32 constant TXTYPE_HASH = 0x81336c6b66e18c614f29c0c96edcbcbc5f8e9221f35377412f0ea5d6f428918e;
 
     // keccak256("TOKENSOFT")
     bytes32 constant SALT = 0x9c360831104e550f13ec032699c5f1d7f17190a31cdaf5c83945a04dfd319eea;
@@ -158,7 +158,8 @@ contract LiteSig {
 
         // EIP712 scheme: https://github.com/ethereum/EIPs/blob/master/EIPS/eip-712.md
         // Note that the nonce is always included from the contract state to prevent replay attacks
-        bytes32 txInputHash = keccak256(abi.encode(TXTYPE_HASH, destination, value, keccak256(data), nonce));
+        // Note that tx.origin is included to ensure only a predetermined account can broadcast
+        bytes32 txInputHash = keccak256(abi.encode(TXTYPE_HASH, destination, value, keccak256(data), nonce, tx.origin));
         bytes32 totalHash = keccak256(abi.encodePacked("\x19\x01", DOMAIN_SEPARATOR, txInputHash));
 
         // Add in the ETH specific prefix
