@@ -2,7 +2,7 @@
 const errors = require('./helpers/errorMessages')
 const createSigs = require('./helpers/createSigs')
 
-const { expectRevert } = require('openzeppelin-test-helpers')
+const { expectRevert } = require('@openzeppelin/test-helpers')
 const LiteSig = artifacts.require('LiteSig')
 
 const CHAINID = 1234

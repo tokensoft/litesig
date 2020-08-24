@@ -7,10 +7,9 @@
     "test": "test"
   },
   "dependencies": {
+    "@openzeppelin/contracts": "^3.1.0",
+    "@openzeppelin/test-helpers": "^0.5.6",
     "chai": "^4.2.0",
-    "ganache-cli": "^6.5.1",
-    "openzeppelin-solidity": "^2.3.0",
-    "openzeppelin-test-helpers": "^0.4.2",
     "solhint": "^2.1.2",
     "truffle": "^5.0.31",
     "web3": "^1.0.0-beta.46"
@@ -20,7 +19,7 @@
     "lint": "solhint \"contracts/**/*.sol\"",
     "compile": "truffle compile",
     "console": "truffle console",
-    "test": "npm run compile && scripts/test.sh"
+    "test": "truffle test"
   },
   "author": "",
   "license": "ISC"
