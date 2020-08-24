@@ -3,7 +3,7 @@ const GenericToken = artifacts.require('GenericToken')
 const LiteSig = artifacts.require('LiteSig')
 const createSigs = require('./helpers/createSigs')
 const constants = require('./helpers/constants')
-const { expectRevert } = require('openzeppelin-test-helpers')
+const { expectRevert } = require('@openzeppelin/test-helpers')
 const errors = require('./helpers/errorMessages')
 
 const { generateOrderedRandomAccountList } = require('./helpers/addressLists')
@@ -18,7 +18,7 @@ contract('LiteSig ERC20 Transfer', (accounts) => {
     await multisig.init(fullCosignerList, 2, constants.CHAINID)
 
     // Populate multisig with Tokens
-    const assetToken = await GenericToken.new('AssetToken', 'AST', 0, 1000)
+    const assetToken = await GenericToken.new('AssetToken', 'AST', 1000)
     await assetToken.transfer(multisig.address, '100')
 
     const destAcct = web3.eth.accounts.create()
@@ -51,7 +51,7 @@ contract('LiteSig ERC20 Transfer', (accounts) => {
     await multisig.init(fullCosignerList, 2, constants.CHAINID)
 
     // Populate multisig with Tokens
-    const assetToken = await GenericToken.new('AssetToken', 'AST', 0, 1000)
+    const assetToken = await GenericToken.new('AssetToken', 'AST', 1000)
     await assetToken.transfer(multisig.address, '100')
 
     const destAcct = web3.eth.accounts.create()

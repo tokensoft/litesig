@@ -1,4 +1,4 @@
-pragma solidity 0.5.8;
+pragma solidity 0.6.12;
 
 /**
  * LiteSig is a lighter weight multisig based on https://github.com/christianlundkvist/simple-multisig
@@ -182,7 +182,7 @@ contract LiteSig {
 
         // Increment the nonce before making external call
         nonce = nonce + 1;
-        (bool success, ) = address(destination).call.value(value)(data);
+        (bool success, ) = address(destination).call{value: value}(data);
         if(success) {
             emit Execution(nonce, destination, value, data);
         } else {
@@ -193,7 +193,7 @@ contract LiteSig {
     }
 
     // Allow ETH to be sent to this contract
-    function () external payable {
+    receive () external payable {
         emit Deposit(msg.sender, msg.value);
     }
 

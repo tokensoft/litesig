@@ -1,6 +1,6 @@
-pragma solidity 0.5.8;
+pragma solidity 0.6.12;
 
-import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
 This contract allows a list of administrators to be tracked.  This list can then be enforced
