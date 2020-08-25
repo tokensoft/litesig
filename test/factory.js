@@ -13,7 +13,8 @@ contract('LiteSig Factory', (accounts) => {
   it('should deploy through factory', async () => {
     const addrs = generateOrderedRandomAddressList(3)
 
-    const deployedFactory = await LiteSigFactory.new()
+    const logicInstance = await LiteSig.new()
+    const deployedFactory = await LiteSigFactory.new(logicInstance.address)
 
     const deployReceipt = await deployedFactory.createLiteSig('0x0', addrs, 2, constants.CHAINID)
 
@@ -27,7 +28,7 @@ contract('LiteSig Factory', (accounts) => {
     })
 
     // Invalid index should not be allowed
-    await expectRevert.assertion(deployed.owners.call(3))
+    await expectRevert.unspecified(deployed.owners.call(3))
 
     assert.equal(await deployed.nonce.call(), 0, 'Nonce should be set')
     assert.equal(await deployed.requiredSignatures.call(), 2, 'requiredSignatures should be set')
@@ -37,7 +38,8 @@ contract('LiteSig Factory', (accounts) => {
   it('should deploy with admin checks', async () => {
     const addrs = generateOrderedRandomAddressList(3)
 
-    const deployedFactory = await LiteSigFactory.new()
+    const logicInstance = await LiteSig.new()
+    const deployedFactory = await LiteSigFactory.new(logicInstance.address)
 
     // Should succeed with default account
     await deployedFactory.createLiteSig('0x0', addrs, 2, constants.CHAINID)
