@@ -47,7 +47,7 @@ contract('LiteSig Addresses', (accounts) => {
 
       // Deploy handler - use index as salt bytes
       const deployReceipt = await walletFactory.createLiteSig('0x' + hashToSubmit, addrs, 2, constants.CHAINID)
-      // assert.equal(expectedAddress, deployReceipt.logs[0].args[0], 'Expected Address should match')
+      assert.equal(expectedAddress, deployReceipt.logs[0].args[0], 'Expected Address should match')
     }
   })
 })
