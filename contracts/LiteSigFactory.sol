@@ -2,20 +2,27 @@ pragma solidity 0.6.12;
 
 import "./LiteSig.sol";
 import "./Administratable.sol";
+import './Proxy.sol';
 
 /**
- * LiteSig Factory creates new instances of the multisig contract and triggers an event
- * for listeners to see the new contract.
+ * LiteSig Factory creates new instances of the proxy class pointing to the multisig 
+ * contract and triggers an event for listeners to see the new contract.
  */
 contract LiteSigFactory is Administratable {
 
   // Event to track deployments
   event Deployed(address indexed deployedAddress);
 
+  // Address where LiteSig logic contract lives
+  address liteSigLogicAddress;
+
   // Constructor for the factory
-  constructor() public {
+  constructor(address _liteSigLogicAddress) public {
     // Add the deployer as an admin by default
     Administratable.addAdmin(msg.sender);
+
+    // Save the logic address
+    liteSigLogicAddress = _liteSigLogicAddress;
   }
 
   /**
@@ -29,12 +36,15 @@ contract LiteSigFactory is Administratable {
     // Track the address for the new contract
     address payable deployedAddress;
 
-    // Get the creation code from the payment handler
-    bytes memory code = type(LiteSig).creationCode;
+    // Get the creation code from the Proxy class
+    bytes memory code = type(Proxy).creationCode;
+
+    // Pack the constructor arg for the proxy initialization
+    bytes memory deployCode = abi.encodePacked(code, abi.encode(liteSigLogicAddress));
 
     // Drop into assembly to deploy with create2
     assembly {
-      deployedAddress := create2(0, add(code, 0x20), mload(code), salt)
+      deployedAddress := create2(0, add(deployCode, 0x20), mload(deployCode), salt)
       if iszero(extcodesize(deployedAddress)) { revert(0, 0) }
     }
 

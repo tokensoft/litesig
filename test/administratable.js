@@ -1,16 +1,19 @@
 /* global artifacts contract it assert */
 const { expectRevert, expectEvent } = require('@openzeppelin/test-helpers')
 const LiteSigFactory = artifacts.require('LiteSigFactory')
+const LiteSig = artifacts.require('LiteSig')
 const errors = require('./helpers/errorMessages')
 
 contract('Administratable', (accounts) => {
   it('should deploy', async () => {
-    const factoryInstance = await LiteSigFactory.new()
+    const logicInstance = await LiteSig.new()
+    const factoryInstance = await LiteSigFactory.new(logicInstance.address)
     assert.equal(factoryInstance !== null, true, 'Contract should be deployed')
   })
 
   it('should allow adding and removing for owner', async () => {
-    const factoryInstance = await LiteSigFactory.new()
+    const logicInstance = await LiteSig.new()
+    const factoryInstance = await LiteSigFactory.new(logicInstance.address)
 
     // Validate acct 1 is not an admin by default
     let isAdmin = await factoryInstance.isAdministrator(accounts[1])
@@ -28,7 +31,8 @@ contract('Administratable', (accounts) => {
   })
 
   it('should preventing adding and removing for non-owner', async () => {
-    const factoryInstance = await LiteSigFactory.new()
+    const logicInstance = await LiteSig.new()
+    const factoryInstance = await LiteSigFactory.new(logicInstance.address)
 
     // Validate acct 2 is not an admin by default
     const isAdmin = await factoryInstance.isAdministrator(accounts[2])
@@ -47,14 +51,16 @@ contract('Administratable', (accounts) => {
   })
 
   it('should emit events for adding admins', async () => {
-    const factoryInstance = await LiteSigFactory.new()
+    const logicInstance = await LiteSig.new()
+    const factoryInstance = await LiteSigFactory.new(logicInstance.address)
 
     const { logs } = await factoryInstance.addAdmin(accounts[3], { from: accounts[0] })
     expectEvent.inLogs(logs, 'AdminAdded', { addedAdmin: accounts[3], addedBy: accounts[0] })
   })
 
   it('should emit events for removing admins', async () => {
-    const factoryInstance = await LiteSigFactory.new()
+    const logicInstance = await LiteSig.new()
+    const factoryInstance = await LiteSigFactory.new(logicInstance.address)
 
     await factoryInstance.addAdmin(accounts[3], { from: accounts[0] })
     const { logs } = await factoryInstance.removeAdmin(accounts[3], { from: accounts[0] })
@@ -63,7 +69,8 @@ contract('Administratable', (accounts) => {
   })
 
   it('should preventing adding an admin when already an admin', async () => {
-    const factoryInstance = await LiteSigFactory.new()
+    const logicInstance = await LiteSig.new()
+    const factoryInstance = await LiteSigFactory.new(logicInstance.address)
 
     // The first add should succeed
     await factoryInstance.addAdmin(accounts[1], { from: accounts[0] })
@@ -73,7 +80,8 @@ contract('Administratable', (accounts) => {
   })
 
   it('should preventing removing an admin when it is not an admin', async () => {
-    const factoryInstance = await LiteSigFactory.new()
+    const logicInstance = await LiteSig.new()
+    const factoryInstance = await LiteSigFactory.new(logicInstance.address)
 
     // Add an accct to the admin list
     await factoryInstance.addAdmin(accounts[1], { from: accounts[0] })
