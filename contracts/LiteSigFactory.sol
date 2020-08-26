@@ -14,7 +14,7 @@ contract LiteSigFactory is Administratable {
   event Deployed(address indexed deployedAddress);
 
   // Address where LiteSig logic contract lives
-  address liteSigLogicAddress;
+  address public liteSigLogicAddress;
 
   // Constructor for the factory
   constructor(address _liteSigLogicAddress) public {
